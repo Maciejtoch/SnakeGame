@@ -36,6 +36,7 @@ class Program
             foreach (var snake in snakes)
                 snake.Move();
 
+            CheckCollisions();
             Thread.Sleep(100);
         }
     }
@@ -66,6 +67,42 @@ class Program
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             foreach (var snake in snakes)
                 snake.HandleInput(keyInfo.Key);
+        }
+    }
+
+    static void CheckCollisions()
+    {
+        foreach (var snake in snakes)
+        {
+            if (snake.X == 0 || snake.X == screenWidth - 1 || snake.Y == 0 || snake.Y == screenHeight - 1)
+            {
+                gameRunning = false;
+                Console.Clear();
+                Console.WriteLine("Game Over! Snake hit the wall.");
+                return;
+            }
+            
+            foreach (var otherSnake in snakes)
+            {
+                if (otherSnake != snake && otherSnake.X == snake.X && otherSnake.Y == snake.Y)
+                {
+                    gameRunning = false;
+                    Console.Clear();
+                    Console.WriteLine("Game Over! Snakes collided.");
+                    return;
+                }
+            }
+            
+            foreach (var obstacle in obstacles)
+            {
+                if (snake.X == obstacle.X && snake.Y == obstacle.Y)
+                {
+                    gameRunning = false;
+                    Console.Clear();
+                    Console.WriteLine("Game Over! Snake hit an obstacle.");
+                    return;
+                }
+            }
         }
     }
 }
@@ -107,14 +144,6 @@ class Snake
         else if (direction == "DOWN") Y++;
         else if (direction == "LEFT") X--;
         else if (direction == "RIGHT") X++;
-
-        if (X == 0 || X == Program.screenWidth - 1 || Y == 0 || Y == Program.screenHeight - 1)
-        {
-            Program.gameRunning = false;
-            Console.Clear();
-            Console.WriteLine("Game Over!");
-            return;
-        }
 
         Console.ForegroundColor = Color;
         Console.SetCursorPosition(X, Y);
